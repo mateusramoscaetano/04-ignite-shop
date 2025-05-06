@@ -1,15 +1,24 @@
+import type { GetStaticProps } from "next";
 import Image from "next/image";
-import "keen-slider/keen-slider.min.css";
 
 import { useKeenSlider } from "keen-slider/react";
 
 import { HomeContainer, Product } from "../styles/pages/home";
 
-import camiseta1 from "../assets/shirts/Type6.png";
-import camiseta2 from "../assets/shirts/Type7.png";
-import camiseta3 from "../assets/shirts/Type8.png";
+import { getProducts } from "../lib/stripe";
+import "keen-slider/keen-slider.min.css";
+import Link from "next/link";
 
-export default function Home() {
+interface HomeProps {
+  products: {
+    id: string;
+    name: string;
+    price: number;
+    image: string;
+  }[];
+}
+
+export default function Home({ products }: HomeProps) {
   const [sliderRef] = useKeenSlider({
     slides: {
       perView: 2,
@@ -20,41 +29,35 @@ export default function Home() {
 
   return (
     <HomeContainer ref={sliderRef} className="keen-slider">
-      <Product className="keen-slider__slide">
-        <Image src={camiseta1} width={520} height={480} alt="" />
+      {products.map((product) => (
+        <Link key={product.id} href={`/product/${product.id}`}>
+          <Product className="keen-slider__slide">
+            <Image
+              src={product.image}
+              width={520}
+              height={480}
+              alt=""
+              priority
+            />
 
-        <footer>
-          <strong>Camiseta X</strong>
-          <span>R$ 79,90</span>
-        </footer>
-      </Product>
-
-      <Product className="keen-slider__slide">
-        <Image src={camiseta2} width={520} height={480} alt="" />
-
-        <footer>
-          <strong>Camiseta X</strong>
-          <span>R$ 79,90</span>
-        </footer>
-      </Product>
-
-      <Product className="keen-slider__slide">
-        <Image src={camiseta3} width={520} height={480} alt="" />
-
-        <footer>
-          <strong>Camiseta X</strong>
-          <span>R$ 79,90</span>
-        </footer>
-      </Product>
-
-      <Product className="keen-slider__slide">
-        <Image src={camiseta3} width={520} height={480} alt="" />
-
-        <footer>
-          <strong>Camiseta X</strong>
-          <span>R$ 79,90</span>
-        </footer>
-      </Product>
+            <footer>
+              <strong>{product.name}</strong>
+              <span>{product.price}</span>
+            </footer>
+          </Product>
+        </Link>
+      ))}
     </HomeContainer>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  const products = await getProducts();
+
+  return {
+    props: {
+      products,
+    },
+    revalidate: 60 * 60 * 2,
+  };
+};
