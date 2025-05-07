@@ -13,6 +13,7 @@ import Head from "next/head";
 import axios, { type AxiosError } from "axios";
 import { api } from "../../lib/axios";
 import { useState } from "react";
+import { useCart } from "../../lib/cart";
 
 interface ProductProps {
   product: {
@@ -26,31 +27,7 @@ interface ProductProps {
 }
 
 export default function Product({ product }: ProductProps) {
-  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
-    useState(false);
-  const { isFallback } = useRouter();
-
-  if (isFallback) {
-    return <Loading />;
-  }
-
-  async function handleBuyButton() {
-    try {
-      setIsCreatingCheckoutSession(true);
-
-      const response = await axios.post("/api/checkout", {
-        priceId: product.priceId,
-      });
-
-      const { checkoutUrl } = response.data;
-
-      window.location.href = checkoutUrl;
-    } catch (err) {
-      setIsCreatingCheckoutSession(false);
-
-      console.log((err as AxiosError).response?.data);
-    }
-  }
+  const { addToCart } = useCart();
 
   return (
     <>
@@ -67,10 +44,14 @@ export default function Product({ product }: ProductProps) {
           <p>{product.description}</p>
 
           <button
-            disabled={isCreatingCheckoutSession}
-            onClick={handleBuyButton}
+            onClick={() =>
+              addToCart({
+                ...product,
+                priceId: product.priceId,
+              })
+            }
           >
-            Comprar agora
+            Colocar na sacola
           </button>
         </ProductDetails>
       </ProductContainer>

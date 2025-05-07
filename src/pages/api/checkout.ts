@@ -5,19 +5,31 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { priceId } = req.body;
+  const { items } = req.body;
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed." });
   }
 
-  if (!priceId) {
-    return res.status(400).json({ error: "Price not found." });
+  if (!items) {
+    return res.status(400).json({ error: "Items not found." });
   }
 
-  const checkoutSession = await getSession(priceId);
+  const missingPriceId = items.some((item: any) => !item.priceId);
+  if (missingPriceId) {
+    return res
+      .status(400)
+      .json({ error: "Some items are missing priceId field." });
+  }
 
-  return res.status(201).json({
-    checkoutUrl: checkoutSession,
-  });
+  try {
+    const checkoutSession = await getSession(items);
+
+    return res.status(201).json({
+      checkoutUrl: checkoutSession,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error creating checkout session." });
+  }
 }

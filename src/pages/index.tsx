@@ -4,22 +4,27 @@ import Head from "next/head";
 
 import { useKeenSlider } from "keen-slider/react";
 
-import { HomeContainer, Product } from "../styles/pages/home";
+import { CartButton, HomeContainer, Product } from "../styles/pages/home";
 
 import { getProducts } from "../lib/stripe";
 import "keen-slider/keen-slider.min.css";
 import Link from "next/link";
-
+import cartIcon from "../assets/cart-icon.svg";
+import { useCart } from "../lib/cart";
 interface HomeProps {
   products: {
     id: string;
     name: string;
     price: string;
     image: string;
+    description: string;
+    priceId: string;
   }[];
 }
 
 export default function Home({ products }: HomeProps) {
+  const { addToCart } = useCart();
+
   const [sliderRef] = useKeenSlider({
     slides: {
       perView: 2,
@@ -35,8 +40,8 @@ export default function Home({ products }: HomeProps) {
       </Head>
       <HomeContainer ref={sliderRef} className="keen-slider">
         {products.map((product) => (
-          <Link key={product.id} href={`/product/${product.id}`}>
-            <Product className="keen-slider__slide">
+          <Product className="keen-slider__slide" key={product.id}>
+            <Link href={`/product/${product.id}`}>
               <Image
                 src={product.image}
                 width={520}
@@ -44,13 +49,24 @@ export default function Home({ products }: HomeProps) {
                 alt=""
                 priority
               />
-
-              <footer>
+            </Link>
+            <footer>
+              <div>
                 <strong>{product.name}</strong>
                 <span>{product.price}</span>
-              </footer>
-            </Product>
-          </Link>
+              </div>
+              <CartButton
+                onClick={() =>
+                  addToCart({
+                    ...product,
+                    priceId: product.priceId,
+                  })
+                }
+              >
+                <Image src={cartIcon} alt="" />
+              </CartButton>
+            </footer>
+          </Product>
         ))}
       </HomeContainer>
     </>

@@ -25,6 +25,8 @@ export const getProducts = async () => {
         currency: "BRL",
       }).format(price.unit_amount / 100),
       image: product.images[0],
+      description: product.description || "",
+      priceId: price.id,
     };
   });
 
@@ -51,20 +53,31 @@ export const getProductById = async (id: string) => {
   };
 };
 
-export const getSession = async (id: string) => {
+export const getSession = async (
+  items: {
+    id: string;
+    name: string;
+    price: string;
+    image: string;
+    description: string;
+    priceId: string;
+  }[]
+) => {
   const successUrl = `${process.env.PUBLIC_NEXT_URL}/success?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${process.env.PUBLIC_NEXT_URL}/`;
+
+  const lineItems = items.map((item) => {
+    return {
+      price: item.priceId,
+      quantity: 1,
+    };
+  });
 
   const session = await stripe.checkout.sessions.create({
     success_url: successUrl,
     cancel_url: cancelUrl,
     mode: "payment",
-    line_items: [
-      {
-        price: id,
-        quantity: 1,
-      },
-    ],
+    line_items: lineItems,
   });
 
   return session.url;

@@ -2,9 +2,11 @@ import { AppProps } from "next/app";
 import { globalStyles } from "../styles/globals";
 import Image from "next/image";
 import logo from "../assets/logo.svg";
-import { Container, Header } from "../styles/pages/app";
+import { Cart, CartCount, Container, Header } from "../styles/pages/app";
 import { useRouter } from "next/router";
-
+import cartIcon from "../assets/cart-icon.svg";
+import { useCart } from "../lib/cart";
+import { CartDrawer } from "../components/cart-drawer";
 globalStyles();
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -25,6 +27,8 @@ export default function App({ Component, pageProps }: AppProps) {
           onClick={handleBackToHome}
           style={{ cursor: "pointer" }}
         />
+
+        <CartDrawer />
       </Header>
       <Component {...pageProps} />
     </Container>

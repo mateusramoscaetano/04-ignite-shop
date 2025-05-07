@@ -26,6 +26,14 @@ export const Product = styled("div", {
     objectFit: "cover",
   },
 
+  div: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    gap: ".75rem",
+  },
+
   footer: {
     position: "absolute",
     bottom: "0.25rem",
@@ -54,6 +62,15 @@ export const Product = styled("div", {
       fontWeight: "bold",
       color: "$green300",
     },
+
+    svg: {
+      width: 32,
+      height: 32,
+
+      "&:hover": {
+        opacity: 1,
+      },
+    },
   },
 
   "&:hover": {
@@ -61,5 +78,18 @@ export const Product = styled("div", {
       transform: "translateY(0%)",
       opacity: 1,
     },
+  },
+});
+
+export const CartButton = styled("button", {
+  background: "$green300",
+  color: "white",
+  padding: "0.75rem",
+  borderRadius: "6px",
+  border: "none",
+  cursor: "pointer",
+
+  "&:hover": {
+    opacity: 0.8,
   },
 });
